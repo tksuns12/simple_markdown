@@ -7,7 +7,8 @@ class RenderMarkdownParagraph extends RenderBox {
   RenderMarkdownParagraph({
     required TextPainter textPainter,
     required EdgeInsets padding,
-  }) : _textPainter = textPainter, _padding = padding;
+  }) : _textPainter = textPainter, 
+       _padding = padding;
 
   TextPainter _textPainter;
   EdgeInsets _padding;

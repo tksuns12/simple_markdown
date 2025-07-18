@@ -15,6 +15,13 @@ class MarkdownStyle {
   final EdgeInsets paragraphPadding;
   final EdgeInsets headerPadding;
   final EdgeInsets listPadding;
+  
+  // Overflow handling properties
+  final TextOverflow textOverflow;
+  final int? maxLines;
+  final bool softWrap;
+  final MainAxisSize mainAxisSize;
+  final CrossAxisAlignment crossAxisAlignment;
 
   const MarkdownStyle({
     this.h1Style = const TextStyle(
@@ -79,6 +86,13 @@ class MarkdownStyle {
     this.paragraphPadding = const EdgeInsets.only(bottom: 16.0),
     this.headerPadding = const EdgeInsets.only(bottom: 16.0, top: 8.0),
     this.listPadding = const EdgeInsets.only(left: 16.0, bottom: 8.0),
+    
+    // Overflow handling defaults
+    this.textOverflow = TextOverflow.clip,
+    this.maxLines,
+    this.softWrap = true,
+    this.mainAxisSize = MainAxisSize.min,
+    this.crossAxisAlignment = CrossAxisAlignment.start,
   });
 
   TextStyle getHeaderStyle(int level) {
@@ -115,6 +129,11 @@ class MarkdownStyle {
     EdgeInsets? paragraphPadding,
     EdgeInsets? headerPadding,
     EdgeInsets? listPadding,
+    TextOverflow? textOverflow,
+    int? maxLines,
+    bool? softWrap,
+    MainAxisSize? mainAxisSize,
+    CrossAxisAlignment? crossAxisAlignment,
   }) {
     return MarkdownStyle(
       h1Style: h1Style ?? this.h1Style,
@@ -131,6 +150,11 @@ class MarkdownStyle {
       paragraphPadding: paragraphPadding ?? this.paragraphPadding,
       headerPadding: headerPadding ?? this.headerPadding,
       listPadding: listPadding ?? this.listPadding,
+      textOverflow: textOverflow ?? this.textOverflow,
+      maxLines: maxLines ?? this.maxLines,
+      softWrap: softWrap ?? this.softWrap,
+      mainAxisSize: mainAxisSize ?? this.mainAxisSize,
+      crossAxisAlignment: crossAxisAlignment ?? this.crossAxisAlignment,
     );
   }
 }

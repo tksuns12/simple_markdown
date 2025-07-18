@@ -7,23 +7,58 @@ import 'styles.dart';
 class MarkdownWidget extends StatelessWidget {
   final String data;
   final MarkdownStyle? style;
+  
+  // Overflow handling properties
+  final TextOverflow? textOverflow;
+  final int? maxLines;
+  final bool? softWrap;
+  final bool shrinkWrap;
+  final BoxConstraints? constraints;
 
   const MarkdownWidget({
     super.key,
     required this.data,
     this.style,
+    this.textOverflow,
+    this.maxLines,
+    this.softWrap,
+    this.shrinkWrap = true,
+    this.constraints,
   });
 
   @override
   Widget build(BuildContext context) {
     final parser = MarkdownParser();
     final document = parser.parse(data);
-    final markdownStyle = style ?? const MarkdownStyle();
+    final baseStyle = style ?? const MarkdownStyle();
     
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: _buildWidgets(document, markdownStyle),
+    // Create effective style with widget-level overrides
+    final effectiveStyle = baseStyle.copyWith(
+      textOverflow: textOverflow ?? baseStyle.textOverflow,
+      maxLines: maxLines ?? baseStyle.maxLines,
+      softWrap: softWrap ?? baseStyle.softWrap,
     );
+    
+    Widget column = Column(
+      mainAxisSize: effectiveStyle.mainAxisSize,
+      crossAxisAlignment: effectiveStyle.crossAxisAlignment,
+      children: shrinkWrap 
+        ? _buildWidgets(document, effectiveStyle)
+        : _buildWidgets(document, effectiveStyle).map((widget) => Expanded(child: widget)).toList(),
+    );
+    
+    // Apply constraints if provided
+    if (constraints != null) {
+      column = ConstrainedBox(
+        constraints: BoxConstraints(
+          maxWidth: constraints!.maxWidth,
+          maxHeight: constraints!.maxHeight.isFinite ? constraints!.maxHeight : double.infinity,
+        ),
+        child: column,
+      );
+    }
+    
+    return column;
   }
 
   List<Widget> _buildWidgets(DocumentNode document, MarkdownStyle style) {
@@ -56,6 +91,9 @@ class MarkdownWidget extends StatelessWidget {
       padding: style.headerPadding,
       child: RichText(
         text: _buildTextSpan(node.children, style.getHeaderStyle(node.level), style),
+        overflow: style.textOverflow,
+        maxLines: style.maxLines,
+        softWrap: style.softWrap,
       ),
     );
   }
@@ -65,6 +103,9 @@ class MarkdownWidget extends StatelessWidget {
       padding: style.paragraphPadding,
       child: RichText(
         text: _buildTextSpan(node.children, style.paragraphStyle, style),
+        overflow: style.textOverflow,
+        maxLines: style.maxLines,
+        softWrap: style.softWrap,
       ),
     );
   }
@@ -93,6 +134,9 @@ class MarkdownWidget extends StatelessWidget {
                 Expanded(
                   child: RichText(
                     text: _buildTextSpan(item.children, style.listItemStyle, style),
+                    overflow: style.textOverflow,
+                    maxLines: style.maxLines,
+                    softWrap: style.softWrap,
                   ),
                 ),
               ],

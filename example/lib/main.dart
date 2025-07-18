@@ -17,7 +17,9 @@ class _MarkdownDemoAppState extends State<MarkdownDemoApp> {
 
   void _toggleTheme() {
     setState(() {
-      _themeMode = _themeMode == ThemeMode.light ? ThemeMode.dark : ThemeMode.light;
+      _themeMode = _themeMode == ThemeMode.light
+          ? ThemeMode.dark
+          : ThemeMode.light;
     });
   }
 
@@ -44,7 +46,7 @@ class _MarkdownDemoAppState extends State<MarkdownDemoApp> {
 
 class MarkdownDemoHome extends StatefulWidget {
   final VoidCallback onThemeToggle;
-  
+
   const MarkdownDemoHome({super.key, required this.onThemeToggle});
 
   @override
@@ -58,7 +60,7 @@ class _MarkdownDemoHomeState extends State<MarkdownDemoHome>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 4, vsync: this);
   }
 
   @override
@@ -90,6 +92,7 @@ class _MarkdownDemoHomeState extends State<MarkdownDemoHome>
             Tab(icon: Icon(Icons.edit), text: 'Live Editor'),
             Tab(icon: Icon(Icons.article), text: 'Samples'),
             Tab(icon: Icon(Icons.palette), text: 'Styles'),
+            Tab(icon: Icon(Icons.waves), text: 'Overflow'),
           ],
         ),
       ),
@@ -99,6 +102,7 @@ class _MarkdownDemoHomeState extends State<MarkdownDemoHome>
           LiveEditorTab(),
           SamplesTab(),
           StyleDemoTab(),
+          OverflowDemoTab(),
         ],
       ),
     );
@@ -114,7 +118,7 @@ class LiveEditorTab extends StatefulWidget {
 
 class _LiveEditorTabState extends State<LiveEditorTab> {
   final TextEditingController _controller = TextEditingController();
-  
+
   final String _initialText = '''# Welcome to Simple Markdown!
 
 This is a **live editor** where you can type markdown and see it rendered in real-time.
@@ -207,9 +211,7 @@ Try editing this text to see the live preview!''';
                     const SizedBox(height: 8),
                     Expanded(
                       child: SingleChildScrollView(
-                        child: MarkdownWidget(
-                          data: _controller.text,
-                        ),
+                        child: MarkdownWidget(data: _controller.text),
                       ),
                     ),
                   ],
@@ -243,7 +245,7 @@ class _SamplesTabState extends State<SamplesTab> {
 ##### Header 5
 ###### Header 6
 
-Regular paragraph text for comparison.'''
+Regular paragraph text for comparison.''',
     },
     {
       'title': 'Text Formatting',
@@ -253,7 +255,7 @@ You can also combine them: ***bold and italic***.
 
 Here's some `inline code` in a sentence.
 
-**Bold** and *italic* can be used together in the same paragraph.'''
+**Bold** and *italic* can be used together in the same paragraph.''',
     },
     {
       'title': 'Lists',
@@ -277,7 +279,7 @@ Alternative syntax:
 Another example:
 1. Plan the project
 2. Execute the plan
-3. Review the results'''
+3. Review the results''',
     },
     {
       'title': 'Mixed Content',
@@ -304,7 +306,7 @@ Simply pass your markdown text to the widget:
 MarkdownWidget(data: "# Hello World")
 ```
 
-That's it! The widget will handle the rest.'''
+That's it! The widget will handle the rest.''',
     },
     {
       'title': 'README Example',
@@ -351,7 +353,7 @@ MarkdownWidget(
 
 ## License
 
-This project is licensed under the MIT License.'''
+This project is licensed under the MIT License.''',
     },
   ];
 
@@ -460,10 +462,7 @@ Here's some `inline code` with custom styling.
 - Unordered item C''';
 
   final List<Map<String, dynamic>> _styles = [
-    {
-      'name': 'Default',
-      'style': const MarkdownStyle(),
-    },
+    {'name': 'Default', 'style': const MarkdownStyle()},
     {
       'name': 'Theme-aware',
       'style': null, // Will be computed based on theme
@@ -479,11 +478,26 @@ Here's some `inline code` with custom styling.
     {
       'name': 'Colorful',
       'style': const MarkdownStyle(
-        h1Style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.blue),
-        h2Style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.green),
-        h3Style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.orange),
+        h1Style: TextStyle(
+          fontSize: 32,
+          fontWeight: FontWeight.bold,
+          color: Colors.blue,
+        ),
+        h2Style: TextStyle(
+          fontSize: 24,
+          fontWeight: FontWeight.bold,
+          color: Colors.green,
+        ),
+        h3Style: TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+          color: Colors.orange,
+        ),
         boldStyle: TextStyle(fontWeight: FontWeight.bold, color: Colors.red),
-        italicStyle: TextStyle(fontStyle: FontStyle.italic, color: Colors.purple),
+        italicStyle: TextStyle(
+          fontStyle: FontStyle.italic,
+          color: Colors.purple,
+        ),
       ),
     },
     {
@@ -516,7 +530,7 @@ Here's some `inline code` with custom styling.
       // Theme-aware style
       final theme = Theme.of(context);
       final textColor = theme.textTheme.bodyMedium?.color ?? Colors.black87;
-      
+
       return MarkdownStyle(
         h1Style: TextStyle(
           fontSize: 32,
@@ -533,18 +547,9 @@ Here's some `inline code` with custom styling.
           fontWeight: FontWeight.bold,
           color: textColor,
         ),
-        paragraphStyle: TextStyle(
-          fontSize: 14,
-          color: textColor,
-        ),
-        boldStyle: TextStyle(
-          fontWeight: FontWeight.bold,
-          color: textColor,
-        ),
-        italicStyle: TextStyle(
-          fontStyle: FontStyle.italic,
-          color: textColor,
-        ),
+        paragraphStyle: TextStyle(fontSize: 14, color: textColor),
+        boldStyle: TextStyle(fontWeight: FontWeight.bold, color: textColor),
+        italicStyle: TextStyle(fontStyle: FontStyle.italic, color: textColor),
         codeStyle: TextStyle(
           fontFamily: 'monospace',
           backgroundColor: theme.brightness == Brightness.light
@@ -552,10 +557,7 @@ Here's some `inline code` with custom styling.
               : const Color(0xFF2D2D2D),
           color: textColor,
         ),
-        listItemStyle: TextStyle(
-          fontSize: 14,
-          color: textColor,
-        ),
+        listItemStyle: TextStyle(fontSize: 14, color: textColor),
       );
     }
     return style;
@@ -629,6 +631,243 @@ Here's some `inline code` with custom styling.
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class OverflowDemoTab extends StatefulWidget {
+  const OverflowDemoTab({super.key});
+
+  @override
+  State<OverflowDemoTab> createState() => _OverflowDemoTabState();
+}
+
+class _OverflowDemoTabState extends State<OverflowDemoTab> {
+  TextOverflow _textOverflow = TextOverflow.clip;
+  int? _maxLines;
+  bool _softWrap = true;
+  double _containerWidth = 200;
+  double _containerHeight = 100;
+
+  final String _longText =
+      '''# This is a very long header that definitely will overflow in a small container
+
+This is a **very long paragraph** with lots of text that will definitely overflow when placed in a constrained container. We can control how this overflow is handled using different TextOverflow options like clip, ellipsis, fade, or visible.
+
+## Another long header to demonstrate overflow behavior
+
+- This is a very long list item that will also overflow
+- Another long item with **bold text** and *italic text*
+- Yet another item with `inline code` that makes it even longer''';
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Overflow Controls',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Text Overflow Control
+                    Text(
+                      'Text Overflow:',
+                      style: Theme.of(context).textTheme.titleSmall,
+                    ),
+                    DropdownButton<TextOverflow>(
+                      value: _textOverflow,
+                      onChanged: (value) {
+                        setState(() {
+                          _textOverflow = value!;
+                        });
+                      },
+                      items: const [
+                        DropdownMenuItem(
+                          value: TextOverflow.clip,
+                          child: Text('Clip'),
+                        ),
+                        DropdownMenuItem(
+                          value: TextOverflow.ellipsis,
+                          child: Text('Ellipsis'),
+                        ),
+                        DropdownMenuItem(
+                          value: TextOverflow.fade,
+                          child: Text('Fade'),
+                        ),
+                        DropdownMenuItem(
+                          value: TextOverflow.visible,
+                          child: Text('Visible'),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Max Lines Control
+                    Text(
+                      'Max Lines:',
+                      style: Theme.of(context).textTheme.titleSmall,
+                    ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Slider(
+                            value: _maxLines?.toDouble() ?? 0,
+                            min: 0,
+                            max: 10,
+                            divisions: 10,
+                            label: _maxLines?.toString() ?? 'None',
+                            onChanged: (value) {
+                              setState(() {
+                                _maxLines = value == 0 ? null : value.toInt();
+                              });
+                            },
+                          ),
+                        ),
+                        Text(_maxLines?.toString() ?? 'None'),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Soft Wrap Control
+                    Row(
+                      children: [
+                        Text(
+                          'Soft Wrap:',
+                          style: Theme.of(context).textTheme.titleSmall,
+                        ),
+                        const Spacer(),
+                        Switch(
+                          value: _softWrap,
+                          onChanged: (value) {
+                            setState(() {
+                              _softWrap = value;
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Container Width Control
+                    Text(
+                      'Container Width:',
+                      style: Theme.of(context).textTheme.titleSmall,
+                    ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Slider(
+                            value: _containerWidth,
+                            min: 100,
+                            max: 400,
+                            divisions: 15,
+                            label: _containerWidth.toInt().toString(),
+                            onChanged: (value) {
+                              setState(() {
+                                _containerWidth = value;
+                              });
+                            },
+                          ),
+                        ),
+                        Text(_containerWidth.toInt().toString()),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Container Height Control
+                    Text(
+                      'Container Height:',
+                      style: Theme.of(context).textTheme.titleSmall,
+                    ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Slider(
+                            value: _containerHeight,
+                            min: 50,
+                            max: 300,
+                            divisions: 25,
+                            label: _containerHeight.toInt().toString(),
+                            onChanged: (value) {
+                              setState(() {
+                                _containerHeight = value;
+                              });
+                            },
+                          ),
+                        ),
+                        Text(_containerHeight.toInt().toString()),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(width: 16),
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Overflow Preview',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Constrained Container
+                    Container(
+                      width: _containerWidth,
+                      height: _containerHeight,
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: SingleChildScrollView(
+                        child: MarkdownWidget(
+                          data: _longText,
+                          textOverflow: _textOverflow,
+                          maxLines: _maxLines,
+                          softWrap: _softWrap,
+                          constraints: BoxConstraints(
+                            maxWidth:
+                                _containerWidth - 16, // Account for padding
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Settings Summary
+                    Text(
+                      'Current Settings:',
+                      style: Theme.of(context).textTheme.titleSmall,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Overflow: ${_textOverflow.toString().split('.').last}\n'
+                      'Max Lines: ${_maxLines?.toString() ?? 'None'}\n'
+                      'Soft Wrap: $_softWrap\n'
+                      'Container: ${_containerWidth.toInt()}x${_containerHeight.toInt()}',
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

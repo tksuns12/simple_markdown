@@ -1,6 +1,6 @@
 name: simple_markdown
 description: "A Flutter package for parsing and rendering markdown using low-level rendering APIs."
-version: 0.0.1
+version: 0.0.2
 homepage: https://github.com/tksuns12/simple_markdown
 
 environment:
