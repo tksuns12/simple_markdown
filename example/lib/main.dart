@@ -834,16 +834,14 @@ This is a **very long paragraph** with lots of text that will definitely overflo
                         border: Border.all(color: Colors.grey),
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: SingleChildScrollView(
-                        child: MarkdownWidget(
-                          data: _longText,
-                          textOverflow: _textOverflow,
-                          maxLines: _maxLines,
-                          softWrap: _softWrap,
-                          constraints: BoxConstraints(
-                            maxWidth:
-                                _containerWidth - 16, // Account for padding
-                          ),
+                      child: MarkdownWidget(
+                        data: _longText,
+                        textOverflow: _textOverflow,
+                        maxLines: _maxLines,
+                        softWrap: _softWrap,
+                        constraints: BoxConstraints(
+                          maxWidth: _containerWidth - 16, // Account for padding
+                          maxHeight: _containerHeight - 16, // Account for padding
                         ),
                       ),
                     ),
