@@ -1,163 +1,109 @@
 import 'nodes.dart';
 
 class MarkdownParser {
-  DocumentNode parse(String markdown) {
-    final lines = markdown.split('\n');
+  static DocumentNode parse(String input) {
+    final lines = input.split('\n');
     final nodes = <MarkdownNode>[];
     
-    for (int i = 0; i < lines.length; i++) {
-      final line = lines[i];
-      
+    for (final line in lines) {
       if (line.trim().isEmpty) {
+        // Skip empty lines
         continue;
-      }
-      
-      final node = _parseLine(line, lines, i);
-      if (node != null) {
-        nodes.add(node);
-        
-        // Skip ahead if we parsed a list that consumed multiple lines
-        if (node is ListNode && node.items.length > 1) {
-          i += node.items.length - 1;
-        }
-      }
-    }
-    
-    return DocumentNode(children: nodes);
-  }
-
-  MarkdownNode? _parseLine(String line, List<String> lines, int startIndex) {
-    final trimmed = line.trim();
-    
-    if (trimmed.startsWith('#')) {
-      return _parseHeader(trimmed);
-    }
-    
-    if (trimmed.startsWith('- ') || trimmed.startsWith('* ') || trimmed.startsWith('+ ')) {
-      return _parseUnorderedList(lines, startIndex);
-    }
-    
-    if (RegExp(r'^\d+\.\s').hasMatch(trimmed)) {
-      return _parseOrderedList(lines, startIndex);
-    }
-    
-    return _parseParagraph(trimmed);
-  }
-
-  HeaderNode _parseHeader(String line) {
-    int level = 0;
-    for (int i = 0; i < line.length && line[i] == '#'; i++) {
-      level++;
-    }
-    
-    final text = line.substring(level).trim();
-    final children = _parseInlineText(text);
-    
-    return HeaderNode(level: level, children: children);
-  }
-
-  ListNode _parseUnorderedList(List<String> lines, int startIndex) {
-    final items = <ListItemNode>[];
-    
-    for (int i = startIndex; i < lines.length; i++) {
-      final line = lines[i].trim();
-      if (line.isEmpty) continue;
-      
-      if (line.startsWith('- ') || line.startsWith('* ') || line.startsWith('+ ')) {
-        final text = line.substring(2).trim();
-        final children = _parseInlineText(text);
-        items.add(ListItemNode(children: children));
+      } else if (line.startsWith('### ')) {
+        nodes.add(HeaderNode(3, _parseInlineText(line.substring(4))));
+      } else if (line.startsWith('## ')) {
+        nodes.add(HeaderNode(2, _parseInlineText(line.substring(3))));
+      } else if (line.startsWith('# ')) {
+        nodes.add(HeaderNode(1, _parseInlineText(line.substring(2))));
+      } else if (line.startsWith('- ')) {
+        nodes.add(ListItemNode(_parseInlineText(line.substring(2))));
       } else {
-        break;
+        nodes.addAll(_parseInlineText(line));
       }
     }
     
-    return ListNode(items: items, ordered: false);
+    return DocumentNode(nodes);
   }
-
-  ListNode _parseOrderedList(List<String> lines, int startIndex) {
-    final items = <ListItemNode>[];
-    
-    for (int i = startIndex; i < lines.length; i++) {
-      final line = lines[i].trim();
-      if (line.isEmpty) continue;
-      
-      final match = RegExp(r'^\d+\.\s').firstMatch(line);
-      if (match != null) {
-        final text = line.substring(match.end).trim();
-        final children = _parseInlineText(text);
-        items.add(ListItemNode(children: children));
-      } else {
-        break;
-      }
-    }
-    
-    return ListNode(items: items, ordered: true);
-  }
-
-  ParagraphNode _parseParagraph(String line) {
-    final children = _parseInlineText(line);
-    return ParagraphNode(children: children);
-  }
-
-  List<MarkdownNode> _parseInlineText(String text) {
+  
+  static List<MarkdownNode> _parseInlineText(String text) {
     final nodes = <MarkdownNode>[];
     final buffer = StringBuffer();
-    bool bold = false;
-    bool italic = false;
-    bool code = false;
+    int i = 0;
     
-    for (int i = 0; i < text.length; i++) {
-      final char = text[i];
-      
-      if (char == '*' && i + 1 < text.length && text[i + 1] == '*') {
-        if (buffer.isNotEmpty) {
-          nodes.add(TextNode(
-            text: buffer.toString(),
-            bold: bold,
-            italic: italic,
-            code: code,
-          ));
-          buffer.clear();
+    while (i < text.length) {
+      if (i < text.length - 1) {
+        // Check for **bold**
+        if (text[i] == '*' && text[i + 1] == '*') {
+          if (buffer.isNotEmpty) {
+            nodes.add(TextNode(buffer.toString()));
+            buffer.clear();
+          }
+          i += 2;
+          final boldStart = i;
+          while (i < text.length - 1 && !(text[i] == '*' && text[i + 1] == '*')) {
+            i++;
+          }
+          if (i < text.length - 1) {
+            nodes.add(TextNode(text.substring(boldStart, i), isBold: true));
+            i += 2;
+          } else {
+            buffer.write('**');
+            i = boldStart;
+          }
+          continue;
         }
-        bold = !bold;
-        i++; // Skip the next *
-      } else if (char == '*') {
-        if (buffer.isNotEmpty) {
-          nodes.add(TextNode(
-            text: buffer.toString(),
-            bold: bold,
-            italic: italic,
-            code: code,
-          ));
-          buffer.clear();
+        
+        // Check for *italic*
+        if (text[i] == '*') {
+          if (buffer.isNotEmpty) {
+            nodes.add(TextNode(buffer.toString()));
+            buffer.clear();
+          }
+          i++;
+          final italicStart = i;
+          while (i < text.length && text[i] != '*') {
+            i++;
+          }
+          if (i < text.length) {
+            nodes.add(TextNode(text.substring(italicStart, i), isItalic: true));
+            i++;
+          } else {
+            buffer.write('*');
+            i = italicStart;
+          }
+          continue;
         }
-        italic = !italic;
-      } else if (char == '`') {
-        if (buffer.isNotEmpty) {
-          nodes.add(TextNode(
-            text: buffer.toString(),
-            bold: bold,
-            italic: italic,
-            code: code,
-          ));
-          buffer.clear();
+        
+        // Check for `code`
+        if (text[i] == '`') {
+          if (buffer.isNotEmpty) {
+            nodes.add(TextNode(buffer.toString()));
+            buffer.clear();
+          }
+          i++;
+          final codeStart = i;
+          while (i < text.length && text[i] != '`') {
+            i++;
+          }
+          if (i < text.length) {
+            nodes.add(TextNode(text.substring(codeStart, i), isCode: true));
+            i++;
+          } else {
+            buffer.write('`');
+            i = codeStart;
+          }
+          continue;
         }
-        code = !code;
-      } else {
-        buffer.write(char);
       }
+      
+      buffer.write(text[i]);
+      i++;
     }
     
     if (buffer.isNotEmpty) {
-      nodes.add(TextNode(
-        text: buffer.toString(),
-        bold: bold,
-        italic: italic,
-        code: code,
-      ));
+      nodes.add(TextNode(buffer.toString()));
     }
     
-    return nodes;
+    return nodes.isEmpty ? [TextNode('')] : nodes;
   }
 }
