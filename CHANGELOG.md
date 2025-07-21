@@ -5,6 +5,57 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.0] - 2024-12-19
+
+### Added
+- **Enhanced inline formatting support**
+  - Bold text parsing with `**bold**` syntax
+  - Italic text parsing with `*italic*` syntax
+  - Inline code parsing with `` `code` `` syntax
+  - Proper nesting and edge case handling for all formatting types
+  - Mixed formatting support (e.g., `**bold and *italic* text**`)
+- **Comprehensive parser improvements**
+  - Robust inline text parsing with `_parseInlineText()` method
+  - Empty line handling for cleaner output
+  - Enhanced header parsing with inline formatting support
+  - Improved list item parsing with inline formatting
+  - Better error handling for unclosed formatting tags
+- **Advanced renderer enhancements**
+  - Complete node type support (TextNode, HeaderNode, ListItemNode)
+  - Proper TextStyle merging for inline formatting
+  - Line break handling around headers and list items
+  - Bullet point rendering for list items
+  - Recursive processing for nested node structures
+- **Architecture optimizations**
+  - Conditional rendering: single RichText widgets rendered directly
+  - Overflow handling with Align widget to prevent expansion issues
+  - Better integration with existing MarkdownStyle system
+- **Comprehensive test suite**
+  - 7 new parser tests covering all inline formatting scenarios
+  - Mixed formatting test cases
+  - Header and list item formatting tests
+  - Edge case and error handling tests
+
+### Changed
+- **Parser logic** completely rewritten for better markdown compliance
+- **Renderer architecture** enhanced to handle all node types properly
+- **Widget rendering** optimized to avoid unnecessary Column wrappers
+- **Style application** improved with proper TextStyle merging
+
+### Fixed
+- **RenderFlex overflow issues** resolved through architectural improvements
+- **Missing inline formatting** now fully supported
+- **Incomplete node rendering** fixed for headers and list items
+- **Layout constraints** properly handled without external dependencies
+- **Text styling** now correctly applies bold, italic, and code formatting
+
+### Technical Details
+- Enhanced parser supports complex inline formatting with proper precedence
+- Renderer uses TextStyle.merge() for combining multiple formatting styles
+- Conditional widget rendering eliminates unnecessary layout wrappers
+- Comprehensive test coverage ensures reliability and backward compatibility
+- All existing functionality preserved while adding significant new capabilities
+
 ## [0.0.2] - 2024-01-18
 
 ### Added
