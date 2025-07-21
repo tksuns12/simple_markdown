@@ -1,49 +1,35 @@
-abstract class MarkdownNode {}
+abstract class MarkdownNode {
+  List<MarkdownNode> children;
+  MarkdownNode([this.children = const []]);
+}
+
+class DocumentNode extends MarkdownNode {
+  DocumentNode([super.children]);
+}
 
 class TextNode extends MarkdownNode {
   final String text;
-  final bool bold;
-  final bool italic;
-  final bool code;
+  final bool isBold;
+  final bool isItalic;
+  final bool isCode;
 
-  TextNode({
-    required this.text,
-    this.bold = false,
-    this.italic = false,
-    this.code = false,
-  });
-}
-
-class ParagraphNode extends MarkdownNode {
-  final List<MarkdownNode> children;
-
-  ParagraphNode({required this.children});
+  TextNode(this.text, {
+    this.isBold = false,
+    this.isItalic = false,
+    this.isCode = false,
+  }) : super();
 }
 
 class HeaderNode extends MarkdownNode {
   final int level;
-  final List<MarkdownNode> children;
-
-  HeaderNode({required this.level, required this.children});
+  HeaderNode(this.level, [super.children]);
 }
 
 class ListNode extends MarkdownNode {
-  final List<ListItemNode> items;
   final bool ordered;
-
-  ListNode({required this.items, this.ordered = false});
+  ListNode(this.ordered, [super.children]);
 }
 
 class ListItemNode extends MarkdownNode {
-  final List<MarkdownNode> children;
-
-  ListItemNode({required this.children});
-}
-
-class LineBreakNode extends MarkdownNode {}
-
-class DocumentNode extends MarkdownNode {
-  final List<MarkdownNode> children;
-
-  DocumentNode({required this.children});
+  ListItemNode([super.children]);
 }

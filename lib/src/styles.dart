@@ -1,22 +1,19 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'nodes.dart';
 
+@immutable
 class MarkdownStyle {
-  final TextStyle h1Style;
-  final TextStyle h2Style;
-  final TextStyle h3Style;
-  final TextStyle h4Style;
-  final TextStyle h5Style;
-  final TextStyle h6Style;
-  final TextStyle paragraphStyle;
-  final TextStyle boldStyle;
-  final TextStyle italicStyle;
-  final TextStyle codeStyle;
-  final TextStyle listItemStyle;
-  final EdgeInsets paragraphPadding;
-  final EdgeInsets headerPadding;
-  final EdgeInsets listPadding;
-  
-  // Overflow handling properties
+  final TextStyle baseStyle;
+  final TextStyle h1;
+  final TextStyle h2;
+  final TextStyle h3;
+  final TextStyle bold;
+  final TextStyle italic;
+  final TextStyle code;
+  final TextStyle listItem;
+  final TextStyle paragraph;
+  final EdgeInsets? paragraphPadding;
+  final EdgeInsets? headerPadding;
   final TextOverflow textOverflow;
   final int? maxLines;
   final bool softWrap;
@@ -24,111 +21,59 @@ class MarkdownStyle {
   final CrossAxisAlignment crossAxisAlignment;
 
   const MarkdownStyle({
-    this.h1Style = const TextStyle(
-      fontSize: 32,
-      fontWeight: FontWeight.bold,
-      height: 1.2,
-      color: Colors.black87,
-    ),
-    this.h2Style = const TextStyle(
-      fontSize: 24,
-      fontWeight: FontWeight.bold,
-      height: 1.2,
-      color: Colors.black87,
-    ),
-    this.h3Style = const TextStyle(
-      fontSize: 18,
-      fontWeight: FontWeight.bold,
-      height: 1.2,
-      color: Colors.black87,
-    ),
-    this.h4Style = const TextStyle(
-      fontSize: 16,
-      fontWeight: FontWeight.bold,
-      height: 1.2,
-      color: Colors.black87,
-    ),
-    this.h5Style = const TextStyle(
-      fontSize: 14,
-      fontWeight: FontWeight.bold,
-      height: 1.2,
-      color: Colors.black87,
-    ),
-    this.h6Style = const TextStyle(
-      fontSize: 12,
-      fontWeight: FontWeight.bold,
-      height: 1.2,
-      color: Colors.black87,
-    ),
-    this.paragraphStyle = const TextStyle(
-      fontSize: 14,
-      height: 1.4,
-      color: Colors.black87,
-    ),
-    this.boldStyle = const TextStyle(
-      fontWeight: FontWeight.bold,
-      color: Colors.black87,
-    ),
-    this.italicStyle = const TextStyle(
-      fontStyle: FontStyle.italic,
-      color: Colors.black87,
-    ),
-    this.codeStyle = const TextStyle(
-      fontFamily: 'monospace',
-      backgroundColor: Color(0xFFF5F5F5),
-      color: Colors.black87,
-    ),
-    this.listItemStyle = const TextStyle(
-      fontSize: 14,
-      height: 1.4,
-      color: Colors.black87,
-    ),
-    this.paragraphPadding = const EdgeInsets.only(bottom: 16.0),
-    this.headerPadding = const EdgeInsets.only(bottom: 16.0, top: 8.0),
-    this.listPadding = const EdgeInsets.only(left: 16.0, bottom: 8.0),
-    
-    // Overflow handling defaults
-    this.textOverflow = TextOverflow.clip,
-    this.maxLines,
-    this.softWrap = true,
-    this.mainAxisSize = MainAxisSize.min,
-    this.crossAxisAlignment = CrossAxisAlignment.start,
-  });
-
-  TextStyle getHeaderStyle(int level) {
-    switch (level) {
-      case 1:
-        return h1Style;
-      case 2:
-        return h2Style;
-      case 3:
-        return h3Style;
-      case 4:
-        return h4Style;
-      case 5:
-        return h5Style;
-      case 6:
-        return h6Style;
-      default:
-        return h6Style;
-    }
-  }
-
-  MarkdownStyle copyWith({
+    this.baseStyle = const TextStyle(),
     TextStyle? h1Style,
     TextStyle? h2Style,
     TextStyle? h3Style,
-    TextStyle? h4Style,
-    TextStyle? h5Style,
-    TextStyle? h6Style,
     TextStyle? paragraphStyle,
     TextStyle? boldStyle,
     TextStyle? italicStyle,
     TextStyle? codeStyle,
     TextStyle? listItemStyle,
+    this.paragraphPadding,
+    this.headerPadding,
+    this.textOverflow = TextOverflow.clip,
+    this.maxLines,
+    this.softWrap = true,
+    this.mainAxisSize = MainAxisSize.max,
+    this.crossAxisAlignment = CrossAxisAlignment.start,
+  }) : h1 = h1Style ?? const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+       h2 = h2Style ?? const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+       h3 = h3Style ?? const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+       bold = boldStyle ?? const TextStyle(fontWeight: FontWeight.bold),
+       italic = italicStyle ?? const TextStyle(fontStyle: FontStyle.italic),
+       code = codeStyle ?? const TextStyle(fontFamily: 'monospace'),
+       listItem = listItemStyle ?? const TextStyle(),
+       paragraph = paragraphStyle ?? const TextStyle();
+
+  TextStyle getTextStyle(MarkdownNode node) {
+    if (node is HeaderNode) {
+      return getHeaderStyle(node.level);
+    }
+    return baseStyle;
+  }
+
+  TextStyle getHeaderStyle(int level) {
+    switch (level) {
+      case 1: return h1;
+      case 2: return h2;
+      case 3: return h3;
+      default: return baseStyle;
+    }
+  }
+
+  MarkdownStyle copyWith({
+    TextStyle? baseStyle,
+    TextStyle? h1Style,
+    TextStyle? h2Style,
+    TextStyle? h3Style,
+    TextStyle? boldStyle,
+    TextStyle? italicStyle,
+    TextStyle? codeStyle,
+    TextStyle? listItemStyle,
+    TextStyle? paragraphStyle,
     EdgeInsets? paragraphPadding,
     EdgeInsets? headerPadding,
-    EdgeInsets? listPadding,
     TextOverflow? textOverflow,
     int? maxLines,
     bool? softWrap,
@@ -136,25 +81,22 @@ class MarkdownStyle {
     CrossAxisAlignment? crossAxisAlignment,
   }) {
     return MarkdownStyle(
-      h1Style: h1Style ?? this.h1Style,
-      h2Style: h2Style ?? this.h2Style,
-      h3Style: h3Style ?? this.h3Style,
-      h4Style: h4Style ?? this.h4Style,
-      h5Style: h5Style ?? this.h5Style,
-      h6Style: h6Style ?? this.h6Style,
-      paragraphStyle: paragraphStyle ?? this.paragraphStyle,
-      boldStyle: boldStyle ?? this.boldStyle,
-      italicStyle: italicStyle ?? this.italicStyle,
-      codeStyle: codeStyle ?? this.codeStyle,
-      listItemStyle: listItemStyle ?? this.listItemStyle,
-      paragraphPadding: paragraphPadding ?? this.paragraphPadding,
-      headerPadding: headerPadding ?? this.headerPadding,
-      listPadding: listPadding ?? this.listPadding,
-      textOverflow: textOverflow ?? this.textOverflow,
-      maxLines: maxLines ?? this.maxLines,
-      softWrap: softWrap ?? this.softWrap,
-      mainAxisSize: mainAxisSize ?? this.mainAxisSize,
-      crossAxisAlignment: crossAxisAlignment ?? this.crossAxisAlignment,
+      baseStyle: baseStyle ?? this.baseStyle,
+      h1Style: h1Style ?? h1,
+       h2Style: h2Style ?? h2,
+       h3Style: h3Style ?? h3,
+       boldStyle: boldStyle ?? bold,
+       italicStyle: italicStyle ?? italic,
+       codeStyle: codeStyle ?? code,
+       listItemStyle: listItemStyle ?? listItem,
+       paragraphStyle: paragraphStyle ?? paragraph,
+       paragraphPadding: paragraphPadding ?? this.paragraphPadding,
+       headerPadding: headerPadding ?? this.headerPadding,
+       textOverflow: textOverflow ?? this.textOverflow,
+       maxLines: maxLines ?? this.maxLines,
+       softWrap: softWrap ?? this.softWrap,
+       mainAxisSize: mainAxisSize ?? this.mainAxisSize,
+       crossAxisAlignment: crossAxisAlignment ?? this.crossAxisAlignment,
     );
   }
 }
