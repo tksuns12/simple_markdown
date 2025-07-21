@@ -1,143 +1,110 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:simple_markdown/simple_markdown.dart';
+import 'package:simple_markdown/src/parser.dart';
+import 'package:simple_markdown/src/nodes.dart';
 
 void main() {
-  group('MarkdownParser', () {
-    late MarkdownParser parser;
-
-    setUp(() {
-      parser = MarkdownParser();
+  group('MarkdownParser Enhanced Tests', () {
+    test('should parse bold text correctly', () {
+      final result = MarkdownParser.parse('This is **bold** text');
+      final nodes = result.children;
+      
+      expect(nodes.length, 3);
+      expect((nodes[0] as TextNode).text, 'This is ');
+      expect((nodes[0] as TextNode).isBold, false);
+      
+      expect((nodes[1] as TextNode).text, 'bold');
+      expect((nodes[1] as TextNode).isBold, true);
+      
+      expect((nodes[2] as TextNode).text, ' text');
+      expect((nodes[2] as TextNode).isBold, false);
     });
-
-    test('parses empty string', () {
-      final result = parser.parse('');
-      expect(result, isA<DocumentNode>());
-      expect(result.children, isEmpty);
+    
+    test('should parse italic text correctly', () {
+      final result = MarkdownParser.parse('This is *italic* text');
+      final nodes = result.children;
+      
+      expect(nodes.length, 3);
+      expect((nodes[0] as TextNode).text, 'This is ');
+      expect((nodes[0] as TextNode).isItalic, false);
+      
+      expect((nodes[1] as TextNode).text, 'italic');
+      expect((nodes[1] as TextNode).isItalic, true);
+      
+      expect((nodes[2] as TextNode).text, ' text');
+      expect((nodes[2] as TextNode).isItalic, false);
     });
-
-    test('parses simple paragraph', () {
-      final result = parser.parse('Hello world');
-      expect(result.children, hasLength(1));
-      expect(result.children[0], isA<ParagraphNode>());
+    
+    test('should parse code text correctly', () {
+      final result = MarkdownParser.parse('This is `code` text');
+      final nodes = result.children;
       
-      final paragraph = result.children[0] as ParagraphNode;
-      expect(paragraph.children, hasLength(1));
-      expect(paragraph.children[0], isA<TextNode>());
+      expect(nodes.length, 3);
+      expect((nodes[0] as TextNode).text, 'This is ');
+      expect((nodes[0] as TextNode).isCode, false);
       
-      final text = paragraph.children[0] as TextNode;
-      expect(text.text, 'Hello world');
-      expect(text.bold, false);
-      expect(text.italic, false);
-      expect(text.code, false);
+      expect((nodes[1] as TextNode).text, 'code');
+      expect((nodes[1] as TextNode).isCode, true);
+      
+      expect((nodes[2] as TextNode).text, ' text');
+      expect((nodes[2] as TextNode).isCode, false);
     });
-
-    test('parses headers', () {
-      final result = parser.parse('# Header 1\n## Header 2\n### Header 3');
-      expect(result.children, hasLength(3));
+    
+    test('should parse headers with inline formatting', () {
+      final result = MarkdownParser.parse('# Header with **bold** text');
+      final nodes = result.children;
       
-      final h1 = result.children[0] as HeaderNode;
-      expect(h1.level, 1);
-      expect((h1.children[0] as TextNode).text, 'Header 1');
+      expect(nodes.length, 1);
+      expect(nodes[0], isA<HeaderNode>());
       
-      final h2 = result.children[1] as HeaderNode;
-      expect(h2.level, 2);
-      expect((h2.children[0] as TextNode).text, 'Header 2');
+      final header = nodes[0] as HeaderNode;
+      expect(header.level, 1);
+      expect(header.children.length, 3);
       
-      final h3 = result.children[2] as HeaderNode;
-      expect(h3.level, 3);
-      expect((h3.children[0] as TextNode).text, 'Header 3');
+      expect((header.children[0] as TextNode).text, 'Header with ');
+      expect((header.children[1] as TextNode).text, 'bold');
+      expect((header.children[1] as TextNode).isBold, true);
+      expect((header.children[2] as TextNode).text, ' text');
     });
-
-    test('parses bold text', () {
-      final result = parser.parse('**bold text**');
-      final paragraph = result.children[0] as ParagraphNode;
-      final text = paragraph.children[0] as TextNode;
+    
+    test('should parse list items with inline formatting', () {
+      final result = MarkdownParser.parse('- Item with *italic* text');
+      final nodes = result.children;
       
-      expect(text.text, 'bold text');
-      expect(text.bold, true);
-      expect(text.italic, false);
+      expect(nodes.length, 1);
+      expect(nodes[0], isA<ListItemNode>());
+      
+      final listItem = nodes[0] as ListItemNode;
+      expect(listItem.children.length, 3);
+      
+      expect((listItem.children[0] as TextNode).text, 'Item with ');
+      expect((listItem.children[1] as TextNode).text, 'italic');
+      expect((listItem.children[1] as TextNode).isItalic, true);
+      expect((listItem.children[2] as TextNode).text, ' text');
     });
-
-    test('parses italic text', () {
-      final result = parser.parse('*italic text*');
-      final paragraph = result.children[0] as ParagraphNode;
-      final text = paragraph.children[0] as TextNode;
+    
+    test('should handle mixed formatting', () {
+      final result = MarkdownParser.parse('Text with **bold**, *italic*, and `code`');
+      final nodes = result.children;
       
-      expect(text.text, 'italic text');
-      expect(text.bold, false);
-      expect(text.italic, true);
+      expect(nodes.length, 6);
+      expect((nodes[0] as TextNode).text, 'Text with ');
+      expect((nodes[1] as TextNode).text, 'bold');
+      expect((nodes[1] as TextNode).isBold, true);
+      expect((nodes[2] as TextNode).text, ', ');
+      expect((nodes[3] as TextNode).text, 'italic');
+      expect((nodes[3] as TextNode).isItalic, true);
+      expect((nodes[4] as TextNode).text, ', and ');
+      expect((nodes[5] as TextNode).text, 'code');
+      expect((nodes[5] as TextNode).isCode, true);
     });
-
-    test('parses code text', () {
-      final result = parser.parse('`code text`');
-      final paragraph = result.children[0] as ParagraphNode;
-      final text = paragraph.children[0] as TextNode;
+    
+    test('should skip empty lines', () {
+      final result = MarkdownParser.parse('Line 1\n\nLine 2');
+      final nodes = result.children;
       
-      expect(text.text, 'code text');
-      expect(text.code, true);
-    });
-
-    test('parses mixed formatting', () {
-      final result = parser.parse('**bold** and *italic* and `code`');
-      final paragraph = result.children[0] as ParagraphNode;
-      
-      expect(paragraph.children, hasLength(5));
-      
-      final bold = paragraph.children[0] as TextNode;
-      expect(bold.text, 'bold');
-      expect(bold.bold, true);
-      
-      final and1 = paragraph.children[1] as TextNode;
-      expect(and1.text, ' and ');
-      
-      final italic = paragraph.children[2] as TextNode;
-      expect(italic.text, 'italic');
-      expect(italic.italic, true);
-      
-      final and2 = paragraph.children[3] as TextNode;
-      expect(and2.text, ' and ');
-      
-      final code = paragraph.children[4] as TextNode;
-      expect(code.text, 'code');
-      expect(code.code, true);
-    });
-
-    test('parses unordered list', () {
-      final result = parser.parse('- Item 1\n- Item 2\n- Item 3');
-      expect(result.children, hasLength(1));
-      
-      final listNode = result.children[0] as ListNode;
-      expect(listNode.ordered, false);
-      expect(listNode.items, hasLength(3));
-      
-      for (int i = 0; i < 3; i++) {
-        expect((listNode.items[i].children[0] as TextNode).text, 'Item ${i + 1}');
-      }
-    });
-
-    test('parses ordered list', () {
-      final result = parser.parse('1. First item\n2. Second item\n3. Third item');
-      expect(result.children, hasLength(1));
-      
-      final listNode = result.children[0] as ListNode;
-      expect(listNode.ordered, true);
-      expect(listNode.items, hasLength(3));
-      
-      final items = ['First item', 'Second item', 'Third item'];
-      for (int i = 0; i < 3; i++) {
-        expect((listNode.items[i].children[0] as TextNode).text, items[i]);
-      }
-    });
-
-    test('ignores empty lines', () {
-      final result = parser.parse('Line 1\n\n\nLine 2');
-      expect(result.children, hasLength(2));
-      
-      final line1 = result.children[0] as ParagraphNode;
-      expect((line1.children[0] as TextNode).text, 'Line 1');
-      
-      final line2 = result.children[1] as ParagraphNode;
-      expect((line2.children[0] as TextNode).text, 'Line 2');
+      expect(nodes.length, 2);
+      expect((nodes[0] as TextNode).text, 'Line 1');
+      expect((nodes[1] as TextNode).text, 'Line 2');
     });
   });
 }
