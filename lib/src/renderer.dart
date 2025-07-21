@@ -23,7 +23,8 @@ class MarkdownRenderer {
   static List<TextSpan> _buildTextSpans(List<MarkdownNode> nodes, MarkdownStyle style) {
     final spans = <TextSpan>[];
     
-    for (final node in nodes) {
+    for (var i = 0; i < nodes.length; i++) {
+      final node = nodes[i];
       if (node is TextNode) {
         TextStyle textStyle = style.baseStyle;
         
@@ -53,6 +54,13 @@ class MarkdownRenderer {
           TextSpan(text: '\n• ', style: style.listItem), // Bullet point
           ..._buildTextSpans(node.children, style),
         ]);
+      } else if (node is ParagraphNode) {
+        spans.addAll(_buildTextSpans(node.children, style));
+        if (i < nodes.length - 1) {
+          spans.add(const TextSpan(text: '\n'));
+        }
+      } else if (node is LineBreakNode) {
+        spans.add(const TextSpan(text: '\n'));
       } else {
         // Handle other node types by processing their children
         spans.addAll(_buildTextSpans(node.children, style));

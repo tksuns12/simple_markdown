@@ -33,3 +33,9 @@ class ListNode extends MarkdownNode {
 class ListItemNode extends MarkdownNode {
   ListItemNode([super.children]);
 }
+
+class ParagraphNode extends MarkdownNode {
+  ParagraphNode([super.children]);
+}
+
+class LineBreakNode extends MarkdownNode {}

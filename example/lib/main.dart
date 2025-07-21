@@ -121,9 +121,7 @@ class _LiveEditorTabState extends State<LiveEditorTab> {
 
   final String _initialText = '''# Welcome to Simple Markdown!
 
-This is a **live editor** where you can type markdown and see it rendered in real-time.
-
-## Features
+This is a **live editor** where you can type markdown and see it rendered in real-time.\n\n# Features
 
 - **Bold text** using `**text**`
 - *Italic text* using `*text*`
@@ -841,7 +839,8 @@ This is a **very long paragraph** with lots of text that will definitely overflo
                         softWrap: _softWrap,
                         constraints: BoxConstraints(
                           maxWidth: _containerWidth - 16, // Account for padding
-                          maxHeight: _containerHeight - 16, // Account for padding
+                          maxHeight:
+                              _containerHeight - 16, // Account for padding
                         ),
                       ),
                     ),

@@ -4,11 +4,13 @@ class MarkdownParser {
   static DocumentNode parse(String input) {
     final lines = input.split('\n');
     final nodes = <MarkdownNode>[];
-    
-    for (final line in lines) {
+
+    for (var i = 0; i < lines.length; i++) {
+      final line = lines[i];
       if (line.trim().isEmpty) {
-        // Skip empty lines
-        continue;
+        if (i > 0 && lines[i - 1].trim().isNotEmpty) {
+          nodes.add(LineBreakNode());
+        }
       } else if (line.startsWith('### ')) {
         nodes.add(HeaderNode(3, _parseInlineText(line.substring(4))));
       } else if (line.startsWith('## ')) {
@@ -18,14 +20,26 @@ class MarkdownParser {
       } else if (line.startsWith('- ')) {
         nodes.add(ListItemNode(_parseInlineText(line.substring(2))));
       } else {
-        nodes.addAll(_parseInlineText(line));
+        nodes.add(ParagraphNode(_parseInlineText(line)));
       }
     }
-    
+
     return DocumentNode(nodes);
   }
   
   static List<MarkdownNode> _parseInlineText(String text) {
+    final lines = text.split('\n');
+    final result = <MarkdownNode>[];
+    for (var i = 0; i < lines.length; i++) {
+      result.addAll(_parseSingleLine(lines[i]));
+      if (i < lines.length - 1) {
+        result.add(LineBreakNode());
+      }
+    }
+    return result;
+  }
+
+  static List<MarkdownNode> _parseSingleLine(String text) {
     final nodes = <MarkdownNode>[];
     final buffer = StringBuffer();
     int i = 0;

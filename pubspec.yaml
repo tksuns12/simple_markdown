@@ -1,6 +1,6 @@
 name: simple_markdown
 description: "A Flutter package for parsing and rendering markdown using low-level rendering APIs."
-version: 0.1.0
+version: 0.2.0
 homepage: https://github.com/tksuns12/simple_markdown
 
 environment:
@@ -15,10 +15,3 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
-
-# For information on the generic Dart part of this file, see the
-# following page: https://dart.dev/tools/pub/pubspec
-
-# The following section is specific to Flutter packages.
-# This package does not include any Flutter-specific assets or fonts.
-flutter: null

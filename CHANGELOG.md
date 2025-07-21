@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] - 2024-12-20
+
+### Added
+- **Paragraph and Line Break Handling**
+  - Introduced `ParagraphNode` to group consecutive lines of text.
+  - Added `LineBreakNode` to preserve explicit line breaks from the source markdown.
+
+### Changed
+- **Parser Refactoring**
+  - The parser now constructs a more structured AST with paragraphs and line breaks.
+  - Improved logic to correctly handle single and multiple newlines.
+- **Renderer Updates**
+  - The renderer now correctly interprets `ParagraphNode` and `LineBreakNode`.
+  - Paragraphs are rendered with appropriate spacing.
+
+### Fixed
+- Newline characters are now preserved in the final rendered output.
+- Mixed content with inline formatting and newlines is handled correctly.
+
 ## [0.1.0] - 2024-12-19
 
 ### Added
